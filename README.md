@@ -44,6 +44,19 @@ npm start
 
 Needs [Node.js](https://nodejs.org/). First launch asks you to name your setup, then you're in. Add apps by hand through Settings, or import from a Caddyfile if you've got one.
 
+**Windows, until there's a real installer**: make a shortcut once so you don't need a terminal to relaunch it —
+
+```powershell
+$exe = "$PWD\node_modules\electron\dist\electron.exe"
+$sc = (New-Object -ComObject WScript.Shell).CreateShortcut("$env:USERPROFILE\Desktop\Home Lab Launcher.lnk")
+$sc.TargetPath = $exe
+$sc.Arguments = "`"$PWD`""
+$sc.WorkingDirectory = "$PWD"
+$sc.Save()
+```
+
+That gives you a desktop icon, and it'll show up in the Start Menu search too — right-click it there to pin to the taskbar.
+
 ## Closing it without losing it
 
 Three ways to back off, from least to most final:

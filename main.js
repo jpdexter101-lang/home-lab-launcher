@@ -396,7 +396,13 @@ ipcMain.on("open-path", (_evt, targetPath) => {
 ipcMain.on("toggle-pin", () => {
   if (!win || win.isDestroyed()) return;
   pinnedOnTop = !pinnedOnTop;
-  win.setAlwaysOnTop(pinnedOnTop, "floating");
+  // Only pass a level when enabling — setAlwaysOnTop(false, 'floating') has
+  // been unreliable at actually clearing topmost on Windows in practice.
+  if (pinnedOnTop) {
+    win.setAlwaysOnTop(true, "floating");
+  } else {
+    win.setAlwaysOnTop(false);
+  }
   win.webContents.send("pin-changed", { pinned: pinnedOnTop });
   updateTrayMenu();
 });
