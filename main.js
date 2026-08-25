@@ -28,6 +28,7 @@ if (safeProfileName) {
 
 const config = require("./config.js");
 const { parseCaddyfile } = require("./caddyImport.js");
+const { findDefaultSteamPath, scanGameFolders } = require("./gameImport.js");
 
 // Second launch of the *same profile* exits immediately instead of piling
 // up extra always-on-top windows that would compound a future lockout.
@@ -511,6 +512,34 @@ ipcMain.handle("import-caddyfile", async () => {
   try {
     const text = fs.readFileSync(result.filePaths[0], "utf8");
     return parseCaddyfile(text);
+  } catch (e) {
+    return { error: String(e) };
+  }
+});
+
+ipcMain.handle("pick-game-folders", async () => {
+  const win2 = settingsWin || win;
+  const defaultSteam = findDefaultSteamPath();
+  const result = await dialog.showOpenDialog(win2, {
+    title: "Select one or more game folders (Steam, Epic, GOG, Battle.net, ...)",
+    defaultPath: defaultSteam || undefined,
+    properties: ["openDirectory", "multiSelections"]
+  });
+  if (result.canceled || !result.filePaths.length) return null;
+  try {
+    const drafts = scanGameFolders(result.filePaths);
+    return { drafts, folders: result.filePaths };
+  } catch (e) {
+    return { error: String(e) };
+  }
+});
+
+ipcMain.handle("scan-default-steam", async () => {
+  const found = findDefaultSteamPath();
+  if (!found) return { error: "Couldn't find Steam in its usual install location — use \"Choose Folder(s)...\" instead." };
+  try {
+    const drafts = scanGameFolders([found]);
+    return { drafts, folders: [found] };
   } catch (e) {
     return { error: String(e) };
   }

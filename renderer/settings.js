@@ -5,6 +5,8 @@ const nameInput = document.getElementById("name-input");
 const brandIconPicker = document.getElementById("brand-icon-picker");
 const autostartCheckbox = document.getElementById("autostart-checkbox");
 const importBtn = document.getElementById("import-btn");
+const steamAutodetectBtn = document.getElementById("steam-autodetect-btn");
+const gameFoldersBtn = document.getElementById("game-folders-btn");
 const importReview = document.getElementById("import-review");
 const importList = document.getElementById("import-list");
 const importTargetCategory = document.getElementById("import-target-category");
@@ -310,6 +312,15 @@ newCategoryInput.addEventListener("keydown", (e) => {
   if (e.key === "Enter") addCategoryBtn.click();
 });
 
+// --- Shared review-list plumbing (Caddyfile import + game import both use this) ---
+
+function openImportReview(drafts, defaultCategoryName) {
+  pendingImportDrafts = drafts;
+  importTargetCategory.value = defaultCategoryName;
+  renderImportList();
+  importReview.style.display = "";
+}
+
 // --- Caddyfile import ---
 
 importBtn.addEventListener("click", async () => {
@@ -326,13 +337,36 @@ importBtn.addEventListener("click", async () => {
       : "No site blocks found in that file.";
     return;
   }
-  pendingImportDrafts = result.drafts;
-  importTargetCategory.value = "Imported";
-  renderImportList();
-  importReview.style.display = "";
+  openImportReview(result.drafts, "Imported");
   importStatus.textContent = result.skippedBlocks
     ? "Found " + result.drafts.length + " hostname(s), skipped " + result.skippedBlocks + " block(s) with no reverse_proxy/redir."
     : "Found " + result.drafts.length + " hostname(s).";
+});
+
+// --- Game import (Steam auto-detect, or any folder(s)) ---
+
+function handleGameScanResult(result) {
+  if (!result) return;
+  if (result.error) {
+    importStatus.textContent = result.error;
+    return;
+  }
+  if (!result.drafts.length) {
+    importStatus.textContent = "No games found in " + (result.folders || []).join(", ") + ".";
+    return;
+  }
+  openImportReview(result.drafts, "Games");
+  importStatus.textContent = "Found " + result.drafts.length + " game" + (result.drafts.length === 1 ? "" : "s") + ".";
+}
+
+steamAutodetectBtn.addEventListener("click", async () => {
+  importStatus.textContent = "Looking for Steam...";
+  handleGameScanResult(await window.settingsAPI.scanDefaultSteam());
+});
+
+gameFoldersBtn.addEventListener("click", async () => {
+  importStatus.textContent = "";
+  handleGameScanResult(await window.settingsAPI.pickGameFolders());
 });
 
 function renderImportList() {
@@ -359,7 +393,7 @@ function renderImportList() {
 
     const urlEl = document.createElement("div");
     urlEl.className = "item-target";
-    urlEl.textContent = draft.url;
+    urlEl.textContent = draft.url || draft.path || "";
 
     row.appendChild(checkbox);
     row.appendChild(iconEl);
@@ -381,7 +415,10 @@ importAddBtn.addEventListener("click", () => {
   checkboxes.forEach((cb) => {
     if (!cb.checked) return;
     const draft = pendingImportDrafts[Number(cb.dataset.index)];
-    target.items.push({ label: draft.label, url: draft.url, icon: draft.icon, color: draft.color });
+    const item = { label: draft.label, icon: draft.icon, color: draft.color };
+    if (draft.path) item.path = draft.path;
+    else item.url = draft.url;
+    target.items.push(item);
     added++;
   });
   persist();

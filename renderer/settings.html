@@ -51,6 +51,19 @@
       <h2>Import from Caddyfile</h2>
       <p class="s-hint">Pulls reverse-proxied hostnames out of a Caddyfile as a starting point — review and edit before adding.</p>
       <button id="import-btn" class="s-btn s-btn-secondary">Choose Caddyfile...</button>
+    </section>
+
+    <section class="s-section">
+      <h2>Import Games</h2>
+      <p class="s-hint">Steam folders are read properly (real names, launches via Steam itself). Any other folder — Epic, GOG, Battle.net, Ubisoft, or just a folder of game folders — gets a best-effort scan for the right .exe. Review and edit before adding, same as Caddyfile.</p>
+      <div class="s-row-actions">
+        <button id="steam-autodetect-btn" class="s-btn s-btn-secondary">Find Steam Games</button>
+        <button id="game-folders-btn" class="s-btn s-btn-secondary">Choose Folder(s)...</button>
+      </div>
+    </section>
+
+    <section class="s-section">
+      <h2>Review Import</h2>
       <div id="import-review" class="import-review" style="display:none;">
         <div class="s-row">
           <label>Add to category</label>

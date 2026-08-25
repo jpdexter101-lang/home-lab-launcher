@@ -11,6 +11,7 @@ A little always-on-top desktop widget that docks in the corner of your screen an
 - Group your stuff into categories (Media, Downloads, Infra, whatever makes sense to you).
 - Tiles can be a URL (opens in your browser) or a local file/shortcut/script (`.lnk`, `.bat`, `.sh`, whatever your OS runs).
 - **Pull tiles straight out of a Caddyfile** if you're running Caddy as a reverse proxy — it reads the site blocks, guesses icons for common self-hosted apps, and gives you an editable checklist before adding anything.
+- **Pull in your installed games** the same way — point it at a Steam folder (auto-detected if it's in the default location) and it reads the real names via Steam's own manifest files. Point it at anything else (Epic, GOG, Battle.net, Ubisoft, or just a folder of game folders) and it does a best-effort scan for the right `.exe` per folder. Same editable checklist either way.
 - Everything's editable through a real settings window — no config files to hand-edit unless you want to.
 - Click a tile, it opens the thing and auto-collapses back to the pill.
 - Survives crashes without locking you out of your own screen (see below).
