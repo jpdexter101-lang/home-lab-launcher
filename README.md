@@ -22,13 +22,13 @@ Name it whatever you want on first launch. It's your desktop.
 
 ## Settings
 
-Add/edit/reorder categories and apps, pick from a built-in icon set, pick a color, toggle "launch at login," import from a Caddyfile. No JSON editing required.
+Add/edit/reorder categories and apps, pick from a built-in icon set, pick a color, toggle "launch at login," import from a Caddyfile or a game folder, spin up another independent profile. No JSON editing required. Opening it auto-collapses the widget out of the way.
 
 ![Settings](screenshots/settings.png)
 
 ## What it looks like fully set up
 
-This is a real one (37 apps, categories, local shortcuts mixed with web links) — not a mockup:
+This is a real one, categories and all, local shortcuts mixed in with web links — not a mockup:
 
 ![Real-world example](screenshots/real-world-example.png)
 
