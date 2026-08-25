@@ -372,6 +372,13 @@ function setAutostart(enable) {
 // project's folder, exactly what our own launch shortcuts point at. Once a
 // packaged build exists this gets simpler (no project-dir argument needed).
 
+// Escapes a value for embedding inside a PowerShell single-quoted string
+// literal ('...') — doubling a single quote is how PS represents one
+// literally, same idea as SQL string escaping.
+function psQuote(value) {
+  return String(value).replace(/'/g, "''");
+}
+
 function spawnProfileInstance(name) {
   const { spawn } = require("child_process");
   const child = spawn(process.execPath, [__dirname, "--profile=" + name], {
@@ -390,12 +397,12 @@ function createProfileShortcutWindows(name) {
   const desktopLnk = path.join(os.homedir(), "Desktop", `Home Lab Launcher (${name}).lnk`);
   const psScript = [
     "$WshShell = New-Object -ComObject WScript.Shell",
-    `$sc = $WshShell.CreateShortcut('${desktopLnk}')`,
-    `$sc.TargetPath = '${exe}'`,
-    `$sc.Arguments = '"${projDir}" --profile=${name}'`,
-    `$sc.WorkingDirectory = '${projDir}'`,
-    `$sc.IconLocation = '${icon}'`,
-    `$sc.Description = 'Home Lab Launcher — ${name}'`,
+    `$sc = $WshShell.CreateShortcut('${psQuote(desktopLnk)}')`,
+    `$sc.TargetPath = '${psQuote(exe)}'`,
+    `$sc.Arguments = '"${psQuote(projDir)}" --profile=${psQuote(name)}'`,
+    `$sc.WorkingDirectory = '${psQuote(projDir)}'`,
+    `$sc.IconLocation = '${psQuote(icon)}'`,
+    `$sc.Description = '${psQuote("Home Lab Launcher — " + name)}'`,
     "$sc.Save()"
   ].join("; ");
   execFileSync("powershell.exe", ["-NoProfile", "-Command", psScript]);
