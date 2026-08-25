@@ -67,6 +67,17 @@ Three ways to back off, from least to most final:
 
 There's also a panic hotkey, `Ctrl+Alt+Shift+D`, that un-pins and hides it from anywhere — and the same thing kicks in automatically if the window ever stops responding (renderer crash, GPU hang, whatever). Point is: an always-on-top widget with no way back is a bad time, so there's always a way back.
 
+## Running more than one at once
+
+Launch with `--profile=NAME` and you get a fully independent instance — its own config file, own window, own name/icon. Doesn't conflict with a plain launch or with other profiles; launching the *same* profile twice just focuses the existing one instead of duplicating it.
+
+```
+electron . --profile=Work
+electron . --profile=Games
+```
+
+To make each one a real shortcut, copy the desktop-shortcut snippet above and add `$sc.Arguments = "\"$PWD\" --profile=Work"` (adjust the name).
+
 ## Notes
 
 - Windows autostart and the pin/quit/panic-hotkey behavior are all tested and confirmed working. Linux autostart writes a real `.desktop` file and the rest of the code is cross-platform Electron/web APIs throughout, but it hasn't actually been run on a Linux box yet — should work, not yet verified. macOS is untested too.

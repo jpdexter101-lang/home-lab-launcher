@@ -2,8 +2,6 @@ const { app, BrowserWindow, ipcMain, shell, screen, Tray, Menu, globalShortcut, 
 const path = require("path");
 const fs = require("fs");
 const os = require("os");
-const config = require("./config.js");
-const { parseCaddyfile } = require("./caddyImport.js");
 
 const COLLAPSED_W = 250;
 const COLLAPSED_H = 46;
@@ -14,9 +12,25 @@ const WATCHDOG_TIMEOUT_MS = 3000;
 const PANIC_ACCELERATOR = "Control+Alt+Shift+D";
 const DEFAULT_APP_NAME = "Home Lab Launcher";
 
-// Second launch (e.g. double-clicking the app while one instance is already
-// running) exits immediately instead of piling up extra always-on-top
-// windows that would compound a future lockout.
+// Run a second (or third...) independent instance side by side via
+// --profile=NAME — e.g. one for a home lab, one for general desktop
+// shortcuts. Each profile gets its own config file and, since Electron's
+// single-instance lock is itself scoped to the userData path, its own lock
+// too — so profiles don't block each other, only a duplicate launch of the
+// *same* profile does. Must happen before anything reads/writes userData or
+// takes the single-instance lock.
+const profileArg = process.argv.find((a) => a.startsWith("--profile="));
+const profileName = profileArg ? profileArg.slice("--profile=".length).trim() : null;
+const safeProfileName = profileName ? profileName.replace(/[^a-zA-Z0-9 _-]/g, "").slice(0, 40) : null;
+if (safeProfileName) {
+  app.setPath("userData", path.join(app.getPath("userData"), "profiles", safeProfileName));
+}
+
+const config = require("./config.js");
+const { parseCaddyfile } = require("./caddyImport.js");
+
+// Second launch of the *same profile* exits immediately instead of piling
+// up extra always-on-top windows that would compound a future lockout.
 if (!app.requestSingleInstanceLock()) {
   app.quit();
 }
@@ -25,6 +39,9 @@ let win;
 let settingsWin;
 let tray;
 let userConfig = config.load();
+if (safeProfileName && !userConfig.name) {
+  userConfig.name = safeProfileName;
+}
 let collapsed = false;
 let animating = false;
 let pinnedOnTop = true;
