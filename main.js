@@ -28,6 +28,10 @@ let userConfig = config.load();
 let collapsed = false;
 let animating = false;
 let pinnedOnTop = true;
+// True only while un-pinned by the emergency path (panicRelease), never by
+// the user's own pin-toggle click — this is what the 'responsive' handler
+// checks before auto-restoring, so a manual un-pin isn't silently reverted.
+let autoUnpinned = false;
 let watchdogTimer = null;
 
 // Content-driven expanded height, measured from the actual rendered DOM
@@ -131,6 +135,7 @@ async function measureExpandedHeight() {
 function panicRelease(reason) {
   if (!win || win.isDestroyed()) return;
   pinnedOnTop = false;
+  autoUnpinned = true;
   try {
     win.setAlwaysOnTop(false);
   } catch (e) {}
@@ -147,6 +152,7 @@ function panicRelease(reason) {
 function restorePin() {
   if (!win || win.isDestroyed()) return;
   pinnedOnTop = true;
+  autoUnpinned = false;
   win.showInactive();
   win.setAlwaysOnTop(true, "floating");
   try {
@@ -217,7 +223,7 @@ function createWindow() {
   // input/paint messages. This is the primary escape hatch.
   win.webContents.on("unresponsive", () => panicRelease("webContents unresponsive"));
   win.webContents.on("responsive", () => {
-    if (!pinnedOnTop) restorePin();
+    if (autoUnpinned) restorePin();
   });
   win.webContents.on("render-process-gone", (_evt, details) => {
     console.error("[launcher] renderer process gone:", details.reason);
@@ -396,6 +402,8 @@ ipcMain.on("toggle-pin", () => {
 });
 
 ipcMain.on("open-settings", () => createSettingsWindow());
+
+ipcMain.on("quit-app", () => app.quit());
 
 ipcMain.handle("get-config", () => userConfig);
 

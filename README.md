@@ -25,6 +25,12 @@ Add/edit/reorder categories and apps, pick from a built-in icon set, pick a colo
 
 ![Settings](screenshots/settings.png)
 
+## What it looks like fully set up
+
+This is a real one (37 apps, categories, local shortcuts mixed with web links) — not a mockup:
+
+![Real-world example](screenshots/real-world-example.png)
+
 ## Getting started
 
 There's no packaged installer yet — this runs from source for now:
@@ -40,11 +46,17 @@ Needs [Node.js](https://nodejs.org/). First launch asks you to name your setup, 
 
 ## Closing it without losing it
 
-The pin button in the header just drops always-on-top — the window stays open, it just stops floating above everything else. The tray icon has Show/Hide and the actual Quit. There's also a panic hotkey, `Ctrl+Alt+Shift+D`, that un-pins and hides it from anywhere — and the same thing kicks in automatically if the window ever stops responding (renderer crash, GPU hang, whatever). Point is: an always-on-top widget with no way back is a bad time, so there's always a way back.
+Three ways to back off, from least to most final:
+
+- **Pin button** — just drops always-on-top. Window stays open, it just stops floating above everything else.
+- **Quit button** (header) — actually closes it. No hunting through a tray icon.
+- **Tray icon** — Show/Hide (keeps running in the background, restores instantly) if you want it out of sight without fully quitting.
+
+There's also a panic hotkey, `Ctrl+Alt+Shift+D`, that un-pins and hides it from anywhere — and the same thing kicks in automatically if the window ever stops responding (renderer crash, GPU hang, whatever). Point is: an always-on-top widget with no way back is a bad time, so there's always a way back.
 
 ## Notes
 
-- Windows and Linux autostart both work (`Launch at login` in Settings). macOS should work too but hasn't been tested much.
+- Windows autostart and the pin/quit/panic-hotkey behavior are all tested and confirmed working. Linux autostart writes a real `.desktop` file and the rest of the code is cross-platform Electron/web APIs throughout, but it hasn't actually been run on a Linux box yet — should work, not yet verified. macOS is untested too.
 - Icons are simple flat SVG glyphs, not real app logos — pick whichever one reads closest.
 - Your config lives outside the app folder (OS user-data dir), so updating the app later won't wipe your setup.
 - No packaged installer/GitHub Actions build yet — that's next.

@@ -4,6 +4,7 @@ const header = document.getElementById("header");
 const collapseBtn = document.getElementById("collapse-btn");
 const pinBtn = document.getElementById("pin-btn");
 const settingsBtn = document.getElementById("settings-btn");
+const quitBtn = document.getElementById("quit-btn");
 const brandGlyph = document.getElementById("brand-glyph");
 const brandTitle = document.getElementById("brand-title");
 const brandCount = document.getElementById("brand-count");
@@ -157,12 +158,13 @@ onboardingName.addEventListener("keydown", (e) => {
 });
 
 header.addEventListener("click", (e) => {
-  if (e.target.closest("#pin-btn") || e.target.closest("#settings-btn")) return;
+  if (e.target.closest("#pin-btn") || e.target.closest("#settings-btn") || e.target.closest("#quit-btn")) return;
   window.launcher.toggleCollapse();
 });
 
 pinBtn.addEventListener("click", () => window.launcher.togglePin());
 settingsBtn.addEventListener("click", () => window.launcher.openSettings());
+quitBtn.addEventListener("click", () => window.launcher.quit());
 
 window.launcher.onState((state) => {
   panel.classList.toggle("collapsed", !!state.collapsed);
