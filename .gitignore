@@ -1,0 +1,6 @@
+node_modules/
+run.log
+capture_test.log
+STATE.md
+*.log
+.DS_Store

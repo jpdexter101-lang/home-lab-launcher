@@ -1,0 +1,105 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Settings</title>
+<link rel="stylesheet" href="settings.css" />
+</head>
+<body>
+  <div id="app">
+    <header id="s-header">
+      <h1>Settings</h1>
+    </header>
+
+    <section class="s-section">
+      <h2>Identity</h2>
+      <div class="s-row">
+        <label>Name</label>
+        <input id="name-input" type="text" maxlength="40" placeholder="e.g. My Home Lab" />
+      </div>
+      <div class="s-row">
+        <label>Icon</label>
+        <div id="brand-icon-picker" class="icon-picker"></div>
+      </div>
+    </section>
+
+    <section class="s-section">
+      <h2>Startup</h2>
+      <div class="s-row s-row-inline">
+        <label class="s-checkbox">
+          <input id="autostart-checkbox" type="checkbox" />
+          <span>Launch at login</span>
+        </label>
+      </div>
+    </section>
+
+    <section class="s-section">
+      <h2>Import from Caddyfile</h2>
+      <p class="s-hint">Pulls reverse-proxied hostnames out of a Caddyfile as a starting point — review and edit before adding.</p>
+      <button id="import-btn" class="s-btn s-btn-secondary">Choose Caddyfile...</button>
+      <div id="import-review" class="import-review" style="display:none;">
+        <div class="s-row">
+          <label>Add to category</label>
+          <input id="import-target-category" type="text" list="category-datalist" placeholder="Category name" />
+          <datalist id="category-datalist"></datalist>
+        </div>
+        <div id="import-list"></div>
+        <div class="s-row-actions">
+          <button id="import-add-btn" class="s-btn">Add Selected</button>
+          <button id="import-cancel-btn" class="s-btn s-btn-ghost">Cancel</button>
+        </div>
+      </div>
+      <p id="import-status" class="s-hint"></p>
+    </section>
+
+    <section class="s-section">
+      <div class="s-section-head">
+        <h2>Categories &amp; Apps</h2>
+      </div>
+      <div id="categories-list"></div>
+      <div class="s-row-actions">
+        <input id="new-category-input" type="text" placeholder="New category name" maxlength="40" />
+        <button id="add-category-btn" class="s-btn s-btn-secondary">Add Category</button>
+      </div>
+    </section>
+  </div>
+
+  <template id="item-form-template">
+    <div class="item-form">
+      <div class="s-row">
+        <label>Label</label>
+        <input class="f-label" type="text" maxlength="30" />
+      </div>
+      <div class="s-row">
+        <label>Type</label>
+        <div class="f-type-toggle">
+          <label><input type="radio" name="f-type" value="url" checked /> Web URL</label>
+          <label><input type="radio" name="f-type" value="path" /> Local file/shortcut</label>
+        </div>
+      </div>
+      <div class="s-row">
+        <label class="f-value-label">URL</label>
+        <div class="f-value-row">
+          <input class="f-value" type="text" placeholder="https://example.com" />
+          <button class="f-browse s-btn s-btn-secondary" type="button" style="display:none;">Browse...</button>
+        </div>
+      </div>
+      <div class="s-row">
+        <label>Icon</label>
+        <div class="f-icon-picker icon-picker"></div>
+      </div>
+      <div class="s-row">
+        <label>Color</label>
+        <input class="f-color" type="color" value="#3b82f6" />
+      </div>
+      <div class="s-row-actions">
+        <button class="f-save s-btn">Save</button>
+        <button class="f-cancel s-btn s-btn-ghost">Cancel</button>
+      </div>
+    </div>
+  </template>
+
+  <script src="icons.js"></script>
+  <script src="settings.js"></script>
+</body>
+</html>

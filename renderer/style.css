@@ -1,0 +1,452 @@
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("fonts/Inter-Variable-latin.woff2") format("woff2");
+}
+
+:root {
+  /* Dark-ops palette (ui-ux-pro-max: dark-mode-oled) */
+  --color-background: #0f172a;
+  --color-panel-start: #111d33;
+  --color-panel-end: #0a0f1c;
+  --color-primary: #1e293b;
+  --color-secondary: #334155;
+  --color-muted: #272f42;
+  --color-border: #475569;
+  --color-foreground: #f8fafc;
+  --color-foreground-mid: #cbd5e1;
+  --color-foreground-dim: #94a3b8;
+  --color-accent: #22c55e;
+  --color-destructive: #ef4444;
+  --color-brand: #f97316;
+
+  --radius-panel: 14px;
+  --radius-tile: 10px;
+  --radius-icon: 9px;
+  --transition-fast: 160ms ease;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  overflow: hidden;
+  font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  user-select: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition-duration: 1ms !important; animation-duration: 1ms !important; }
+}
+
+#panel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(165deg, var(--color-panel-start), var(--color-panel-end));
+  border: 1px solid color-mix(in srgb, var(--color-border) 45%, transparent);
+  border-radius: var(--radius-panel);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+  overflow: hidden;
+  -webkit-app-region: no-drag;
+}
+
+#header {
+  flex: 0 0 auto;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px 0 14px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--color-primary) 55%, transparent), transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-border) 35%, transparent);
+  cursor: pointer;
+  -webkit-app-region: drag;
+}
+
+#header:focus-visible,
+.tile:focus-visible,
+#header-actions button:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+#brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+#brand-glyph {
+  width: 19px;
+  height: 19px;
+  flex: 0 0 auto;
+  color: var(--color-brand);
+  filter: drop-shadow(0 0 5px color-mix(in srgb, var(--color-brand) 55%, transparent));
+}
+
+#brand-glyph svg {
+  width: 100%;
+  height: 100%;
+}
+
+#brand-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+
+#brand-title {
+  color: var(--color-foreground);
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#brand-count {
+  color: var(--color-foreground-dim);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+}
+
+#header-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: 0 0 auto;
+}
+
+#header-actions button {
+  -webkit-app-region: no-drag;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--color-foreground-mid);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+#header-actions button:hover {
+  background: color-mix(in srgb, var(--color-secondary) 60%, transparent);
+  color: var(--color-foreground);
+}
+
+#header-actions button svg {
+  width: 16px;
+  height: 16px;
+}
+
+#collapse-btn svg {
+  transition: transform var(--transition-fast);
+}
+
+#panel.collapsed #collapse-btn svg {
+  transform: rotate(-90deg);
+}
+
+#pin-btn {
+  color: var(--color-accent);
+}
+
+#pin-btn svg {
+  transition: transform var(--transition-fast), color var(--transition-fast);
+}
+
+#pin-btn:hover {
+  background: color-mix(in srgb, var(--color-accent) 20%, transparent);
+}
+
+#pin-btn.unpinned {
+  color: var(--color-foreground-dim);
+}
+
+#pin-btn.unpinned svg {
+  transform: rotate(35deg);
+}
+
+#pin-btn.unpinned:hover {
+  background: color-mix(in srgb, var(--color-secondary) 60%, transparent);
+  color: var(--color-foreground);
+}
+
+#grid {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+#grid::-webkit-scrollbar { width: 8px; }
+#grid::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--color-secondary) 70%, transparent); border-radius: 4px; }
+#grid::-webkit-scrollbar-track { background: transparent; }
+
+.category-row + .category-row {
+  border-top: 1px solid color-mix(in srgb, var(--color-foreground) 14%, transparent);
+  margin-top: 7px;
+  padding-top: 6px;
+}
+
+.category-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--color-foreground-mid);
+  margin-bottom: 5px;
+}
+
+.category-tiles {
+  display: grid;
+  grid-template-columns: repeat(var(--row-count), minmax(0, 1fr));
+  gap: 8px;
+}
+
+.tile {
+  -webkit-app-region: no-drag;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px 4px;
+  min-width: 0;
+  border-radius: var(--radius-tile);
+  background: color-mix(in srgb, var(--color-foreground) 6%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-foreground) 16%, transparent);
+  cursor: pointer;
+  transition: transform var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.tile:hover,
+.tile:focus-visible {
+  background: color-mix(in srgb, var(--color-foreground) 12%, transparent);
+  border-color: var(--accent, var(--color-border));
+  transform: translateY(-1px);
+}
+
+.tile:active {
+  transform: translateY(0px) scale(0.97);
+}
+
+.tile-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-icon);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent, var(--color-accent));
+  color: #ffffff;
+  box-shadow: 0 1px 0 0 rgba(0,0,0,0.18) inset, 0 0 0 1px color-mix(in srgb, var(--accent, var(--color-accent)) 60%, black) inset;
+}
+
+.tile-icon svg {
+  width: 15px;
+  height: 15px;
+}
+
+.tile-label {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--color-foreground-mid);
+  text-align: center;
+  line-height: 1.2;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tile:hover .tile-label,
+.tile:focus-visible .tile-label {
+  color: var(--color-foreground);
+}
+
+#panel.collapsed #grid {
+  display: none;
+}
+
+#panel.collapsed #brand-count {
+  display: none;
+}
+
+#panel.collapsed #settings-btn {
+  display: none;
+}
+
+#panel.collapsed #header {
+  border-bottom: none;
+}
+
+#empty-state {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 20px;
+  text-align: center;
+}
+
+#empty-state p {
+  color: var(--color-foreground-mid);
+  font-size: 13px;
+}
+
+#empty-state button {
+  -webkit-app-region: no-drag;
+  background: var(--color-accent);
+  color: #0f172a;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+}
+
+#empty-state button:hover {
+  opacity: 0.88;
+}
+
+#onboarding {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(165deg, var(--color-panel-start), var(--color-panel-end));
+  -webkit-app-region: no-drag;
+}
+
+#panel.onboarding-active #onboarding {
+  display: flex;
+}
+
+#onboarding-card {
+  width: min(360px, 86%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+}
+
+#onboarding-glyph {
+  width: 44px;
+  height: 44px;
+  color: var(--color-brand);
+  margin-bottom: 4px;
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--color-brand) 55%, transparent));
+}
+
+#onboarding-glyph svg {
+  width: 100%;
+  height: 100%;
+}
+
+#onboarding-card h1 {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--color-foreground);
+}
+
+#onboarding-card p {
+  font-size: 12px;
+  color: var(--color-foreground-dim);
+  margin-bottom: 6px;
+}
+
+#onboarding-name {
+  width: 100%;
+  background: color-mix(in srgb, var(--color-foreground) 6%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-foreground) 20%, transparent);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--color-foreground);
+  text-align: center;
+}
+
+#onboarding-name:focus {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+
+#onboarding-icons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin: 4px 0 6px;
+}
+
+.onboarding-icon-btn {
+  -webkit-app-region: no-drag;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--color-foreground) 16%, transparent);
+  background: color-mix(in srgb, var(--color-foreground) 6%, transparent);
+  color: var(--color-foreground-mid);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.onboarding-icon-btn svg {
+  width: 17px;
+  height: 17px;
+}
+
+.onboarding-icon-btn.selected {
+  background: var(--color-brand);
+  border-color: var(--color-brand);
+  color: #ffffff;
+}
+
+#onboarding-submit {
+  -webkit-app-region: no-drag;
+  width: 100%;
+  background: var(--color-accent);
+  color: #0f172a;
+  border: none;
+  border-radius: 8px;
+  padding: 11px;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+}
+
+#onboarding-submit:hover {
+  opacity: 0.88;
+}

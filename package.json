@@ -1,0 +1,14 @@
+{
+  "name": "home-lab-launcher",
+  "productName": "Home Lab Launcher",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Always-on-top desktop widget for launching your home lab's apps — pick your own tiles or import them from a Caddyfile",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^43.4.1"
+  }
+}
