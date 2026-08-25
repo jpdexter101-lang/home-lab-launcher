@@ -72,7 +72,10 @@ function renderEmptyState() {
     "<p>No apps added yet.</p>" +
     '<button id="empty-settings-btn">Open Settings</button>';
   grid.appendChild(empty);
-  document.getElementById("empty-settings-btn").addEventListener("click", () => window.launcher.openSettings());
+  document.getElementById("empty-settings-btn").addEventListener("click", () => {
+    window.launcher.toggleCollapse();
+    window.launcher.openSettings();
+  });
 }
 
 function renderTiles() {
@@ -163,7 +166,12 @@ header.addEventListener("click", (e) => {
 });
 
 pinBtn.addEventListener("click", () => window.launcher.togglePin());
-settingsBtn.addEventListener("click", () => window.launcher.openSettings());
+settingsBtn.addEventListener("click", () => {
+  if (!panel.classList.contains("collapsed")) {
+    window.launcher.toggleCollapse();
+  }
+  window.launcher.openSettings();
+});
 quitBtn.addEventListener("click", () => window.launcher.quit());
 
 window.launcher.onState((state) => {
