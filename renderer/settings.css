@@ -174,6 +174,35 @@ input[type="color"] {
   margin-top: 10px;
 }
 
+.preset-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.preset-chip {
+  -webkit-app-region: no-drag;
+  background: color-mix(in srgb, var(--color-foreground) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-foreground) 16%, transparent);
+  color: var(--color-foreground-mid);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.preset-chip:hover {
+  background: color-mix(in srgb, var(--color-accent) 20%, transparent);
+  border-color: var(--color-accent);
+  color: var(--color-foreground);
+}
+
+.s-row-inline input[type="text"] {
+  flex: 1 1 auto;
+}
+
 .import-review {
   margin-top: 12px;
   border-top: 1px solid color-mix(in srgb, var(--color-foreground) 10%, transparent);

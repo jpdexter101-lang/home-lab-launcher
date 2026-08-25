@@ -16,6 +16,10 @@ const newCategoryInput = document.getElementById("new-category-input");
 const addCategoryBtn = document.getElementById("add-category-btn");
 const categoryDatalist = document.getElementById("category-datalist");
 const itemFormTemplate = document.getElementById("item-form-template");
+const profilePresets = document.getElementById("profile-presets");
+const profileNameInput = document.getElementById("profile-name-input");
+const createProfileBtn = document.getElementById("create-profile-btn");
+const profileStatus = document.getElementById("profile-status");
 
 function iconSvg(iconKey) {
   const markup = window.ICONS[iconKey] || window.ICONS.grid;
@@ -391,6 +395,48 @@ importCancelBtn.addEventListener("click", () => {
   importReview.style.display = "none";
   pendingImportDrafts = [];
   importStatus.textContent = "";
+});
+
+// --- Run Another One (profiles) ---
+
+const PROFILE_PRESETS = ["Games", "Editor", "Creative", "Work"];
+
+for (const preset of PROFILE_PRESETS) {
+  const chip = document.createElement("button");
+  chip.type = "button";
+  chip.className = "preset-chip";
+  chip.textContent = preset;
+  chip.addEventListener("click", () => {
+    profileNameInput.value = preset;
+    profileNameInput.focus();
+  });
+  profilePresets.appendChild(chip);
+}
+
+createProfileBtn.addEventListener("click", async () => {
+  const name = profileNameInput.value.trim();
+  if (!name) {
+    profileStatus.textContent = "Enter a name first.";
+    profileNameInput.focus();
+    return;
+  }
+  createProfileBtn.disabled = true;
+  createProfileBtn.textContent = "Creating...";
+  const result = await window.settingsAPI.createProfile(name);
+  createProfileBtn.disabled = false;
+  createProfileBtn.textContent = "Create & Launch";
+  if (!result.ok) {
+    profileStatus.textContent = result.error;
+    return;
+  }
+  profileStatus.textContent = result.shortcutCreated
+    ? `Launched "${name}" — desktop shortcut created too.`
+    : "Launched, but " + (result.error || "couldn't create a shortcut for it.");
+  profileNameInput.value = "";
+});
+
+profileNameInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") createProfileBtn.click();
 });
 
 // --- Init ---

@@ -366,6 +366,58 @@ function setAutostart(enable) {
   }
 }
 
+// --- Creating a new profile (a second/third independent instance) ---
+// Only meaningful for the source-run (`electron .`) setup this repo ships
+// today — process.execPath is Electron's own binary and __dirname is this
+// project's folder, exactly what our own launch shortcuts point at. Once a
+// packaged build exists this gets simpler (no project-dir argument needed).
+
+function spawnProfileInstance(name) {
+  const { spawn } = require("child_process");
+  const child = spawn(process.execPath, [__dirname, "--profile=" + name], {
+    detached: true,
+    stdio: "ignore",
+    cwd: __dirname
+  });
+  child.unref();
+}
+
+function createProfileShortcutWindows(name) {
+  const { execFileSync } = require("child_process");
+  const exe = process.execPath;
+  const projDir = __dirname;
+  const icon = path.join(__dirname, "renderer", "assets", "tray.ico");
+  const desktopLnk = path.join(os.homedir(), "Desktop", `Home Lab Launcher (${name}).lnk`);
+  const psScript = [
+    "$WshShell = New-Object -ComObject WScript.Shell",
+    `$sc = $WshShell.CreateShortcut('${desktopLnk}')`,
+    `$sc.TargetPath = '${exe}'`,
+    `$sc.Arguments = '"${projDir}" --profile=${name}'`,
+    `$sc.WorkingDirectory = '${projDir}'`,
+    `$sc.IconLocation = '${icon}'`,
+    `$sc.Description = 'Home Lab Launcher — ${name}'`,
+    "$sc.Save()"
+  ].join("; ");
+  execFileSync("powershell.exe", ["-NoProfile", "-Command", psScript]);
+}
+
+function createProfileShortcutLinux(name) {
+  const exe = process.execPath;
+  const projDir = __dirname;
+  const desktopDir = path.join(os.homedir(), "Desktop");
+  const content = [
+    "[Desktop Entry]",
+    "Type=Application",
+    `Name=Home Lab Launcher (${name})`,
+    `Exec="${exe}" "${projDir}" --profile=${name}`,
+    "Terminal=false",
+    ""
+  ].join("\n");
+  fs.mkdirSync(desktopDir, { recursive: true });
+  const p = path.join(desktopDir, `home-lab-launcher-${name.toLowerCase().replace(/\s+/g, "-")}.desktop`);
+  fs.writeFileSync(p, content, { mode: 0o755 });
+}
+
 app.whenReady().then(() => {
   createWindow();
   createTray();
@@ -469,6 +521,26 @@ ipcMain.handle("get-autostart", () => getAutostart());
 ipcMain.handle("set-autostart", (_evt, enable) => {
   setAutostart(!!enable);
   return getAutostart();
+});
+
+ipcMain.handle("create-profile", (_evt, name) => {
+  const clean = String(name || "").trim().replace(/[^a-zA-Z0-9 _-]/g, "").slice(0, 40);
+  if (!clean) return { ok: false, error: "Enter a name first." };
+  if (clean.toLowerCase() === (safeProfileName || "").toLowerCase()) {
+    return { ok: false, error: "That's the profile you're already in." };
+  }
+  try {
+    spawnProfileInstance(clean);
+  } catch (e) {
+    return { ok: false, error: "Couldn't launch it: " + String(e) };
+  }
+  try {
+    if (process.platform === "win32") createProfileShortcutWindows(clean);
+    else if (process.platform === "linux") createProfileShortcutLinux(clean);
+    return { ok: true, shortcutCreated: true };
+  } catch (e) {
+    return { ok: true, shortcutCreated: false, error: "Launched, but couldn't create a shortcut: " + String(e) };
+  }
 });
 
 app.on("window-all-closed", () => {
